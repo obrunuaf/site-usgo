@@ -620,39 +620,57 @@ export default function App() {
             {isMobileMenuOpen ? <X size={32} /> : <Menu size={32} />}
           </button>
         </div>
-
-        {/* Mobile Menu with Animation */}
-        {isMobileMenuOpen && (
-          <>
-            {/* Overlay behind menu - starts below nav to not block menu toggle */}
-            <div 
-              className="fixed inset-x-0 bottom-0 backdrop-blur-sm bg-black/70 lg:hidden"
-              style={{ zIndex: 45, top: '80px' }}
-              onClick={() => setIsMobileMenuOpen(false)}
-              aria-hidden="true"
-            />
-            <div 
-              className="flex absolute left-0 top-full flex-col gap-6 p-6 w-full border-b shadow-2xl mobile-menu bg-zinc-900 border-white/10 lg:hidden" 
-              style={{ zIndex: 55 }} 
-              role="menu"
-              onClick={(e) => e.stopPropagation()}
-            >
-            <button onClick={() => scrollToSection('inicio')} className="text-lg font-bold text-left transition-colors text-zinc-300 hover:text-red-500" role="menuitem">Início</button>
-            <button onClick={() => scrollToSection('sobre')} className="text-lg font-bold text-left transition-colors text-zinc-300 hover:text-red-500" role="menuitem">Sobre</button>
-            <button onClick={() => scrollToSection('escolas')} className="text-lg font-bold text-left transition-colors text-zinc-300 hover:text-red-500" role="menuitem">Escolas</button>
-            <button onClick={() => scrollToSection('galeria')} className="text-lg font-bold text-left transition-colors text-zinc-300 hover:text-red-500" role="menuitem">Galeria</button>
-            <button onClick={() => scrollToSection('faq')} className="text-lg font-bold text-left transition-colors text-zinc-300 hover:text-red-500" role="menuitem">Perguntas Frequentes</button>
-            <button 
-              onClick={() => { setIsMobileMenuOpen(false); setShowContactForm(true); }} 
-              className="py-4 w-full font-bold tracking-wider text-white uppercase bg-red-600 transition-colors hover:bg-red-700"
-              role="menuitem"
-            >
-              Contato
-            </button>
-            </div>
-          </>
-        )}
       </nav>
+
+      {/* Mobile Menu - Outside nav for proper z-index */}
+      {isMobileMenuOpen && (
+        <div className="fixed inset-0 z-[200] lg:hidden">
+          {/* Dark overlay */}
+          <div 
+            className="absolute inset-0 bg-black/80"
+            onClick={() => setIsMobileMenuOpen(false)}
+          />
+          {/* Menu panel */}
+          <div 
+            className="absolute top-0 left-0 right-0 bg-zinc-900 shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Menu header with logo and close button */}
+            <div className="flex justify-between items-center p-6 border-b border-white/10">
+              <div className="flex gap-3 items-center">
+                <img 
+                  src={images.logo} 
+                  alt="USGO Logo" 
+                  className="h-10 w-auto object-contain"
+                />
+                <span className="text-xl italic font-black tracking-tighter uppercase text-white">
+                  USGO <span className="text-red-600">Jiu-Jitsu</span>
+                </span>
+              </div>
+              <button 
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="text-white p-2"
+              >
+                <X size={28} />
+              </button>
+            </div>
+            {/* Menu items */}
+            <div className="flex flex-col p-6 gap-4">
+              <button onClick={() => scrollToSection('inicio')} className="text-left text-lg font-bold text-zinc-300 hover:text-red-500 py-2">Início</button>
+              <button onClick={() => scrollToSection('sobre')} className="text-left text-lg font-bold text-zinc-300 hover:text-red-500 py-2">Sobre</button>
+              <button onClick={() => scrollToSection('escolas')} className="text-left text-lg font-bold text-zinc-300 hover:text-red-500 py-2">Escolas</button>
+              <button onClick={() => scrollToSection('galeria')} className="text-left text-lg font-bold text-zinc-300 hover:text-red-500 py-2">Galeria</button>
+              <button onClick={() => scrollToSection('faq')} className="text-left text-lg font-bold text-zinc-300 hover:text-red-500 py-2">Perguntas Frequentes</button>
+              <button 
+                onClick={() => { setIsMobileMenuOpen(false); setShowContactForm(true); }} 
+                className="mt-4 py-4 w-full font-bold tracking-wider text-white uppercase bg-red-600 hover:bg-red-700 transition-colors"
+              >
+                Contato
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Hero Section */}
       <section id="inicio" className="flex overflow-hidden relative justify-center items-center h-screen">
