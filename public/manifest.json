@@ -1,0 +1,27 @@
+{
+  "name": "USGO Jiu-Jitsu",
+  "short_name": "USGO",
+  "description": "Academia de Brazilian Jiu-Jitsu liderada por Arthur Claudino. Excelência técnica, valores inegociáveis.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#09090b",
+  "theme_color": "#dc2626",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/logo-redonda.webp",
+      "sizes": "192x192",
+      "type": "image/webp",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/logo-branca.webp",
+      "sizes": "512x512",
+      "type": "image/webp",
+      "purpose": "any"
+    }
+  ],
+  "categories": ["sports", "fitness", "education"],
+  "lang": "pt-BR"
+}

@@ -1,0 +1,9 @@
+# USGO Jiu-Jitsu - Robots.txt
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://usgo.com.br/sitemap.xml
+
+# Crawl-delay (optional, for politeness)
+Crawl-delay: 1
