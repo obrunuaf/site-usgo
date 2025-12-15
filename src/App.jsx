@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
-import { Menu, X, ChevronDown, ChevronUp, MapPin, Phone, Mail, Instagram, ArrowRight, Search, Shield, Target, Globe, Navigation, ArrowUp, Send, CheckCircle, User, MessageSquare, MessageCircle, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Menu, X, ChevronDown, ChevronUp, MapPin, Phone, Mail, Instagram, ArrowRight, Search, Shield, Target, Globe, Navigation, ArrowUp, Send, CheckCircle, User, MessageSquare, MessageCircle, ChevronLeft, ChevronRight, Shirt } from 'lucide-react';
 
 // ===== CUSTOM HOOKS =====
 
@@ -603,8 +604,10 @@ export default function App() {
             <button onClick={() => scrollToSection('inicio')} className="transition-colors hover:text-red-500" aria-label="Ir para início">Início</button>
             <button onClick={() => scrollToSection('sobre')} className="transition-colors hover:text-red-500" aria-label="Ir para sobre">Sobre</button>
             <button onClick={() => scrollToSection('escolas')} className="transition-colors hover:text-red-500" aria-label="Ir para escolas">Escolas</button>
+            <button onClick={() => scrollToSection('filiacoes')} className="transition-colors hover:text-red-500" aria-label="Ir para filiações">Filiações</button>
             <button onClick={() => scrollToSection('galeria')} className="transition-colors hover:text-red-500" aria-label="Ir para galeria">Galeria</button>
             <button onClick={() => scrollToSection('faq')} className="transition-colors hover:text-red-500" aria-label="Ir para perguntas frequentes">Perguntas Frequentes</button>
+            <Link to="/uniformes" className="flex gap-1 items-center transition-colors hover:text-red-500" aria-label="Ir para uniformes"><Shirt size={14} />Uniformes</Link>
             <button 
               onClick={() => setShowContactForm(true)}
               className="bg-white text-black px-6 py-3 hover:bg-red-600 hover:text-white transition-all duration-300 font-black skew-x-[-10deg]"
@@ -663,8 +666,10 @@ export default function App() {
               <button onClick={() => scrollToSection('inicio')} className="py-2 text-lg font-bold text-left text-zinc-300 hover:text-red-500">Início</button>
               <button onClick={() => scrollToSection('sobre')} className="py-2 text-lg font-bold text-left text-zinc-300 hover:text-red-500">Sobre</button>
               <button onClick={() => scrollToSection('escolas')} className="py-2 text-lg font-bold text-left text-zinc-300 hover:text-red-500">Escolas</button>
+              <button onClick={() => scrollToSection('filiacoes')} className="py-2 text-lg font-bold text-left text-zinc-300 hover:text-red-500">Filiações</button>
               <button onClick={() => scrollToSection('galeria')} className="py-2 text-lg font-bold text-left text-zinc-300 hover:text-red-500">Galeria</button>
               <button onClick={() => scrollToSection('faq')} className="py-2 text-lg font-bold text-left text-zinc-300 hover:text-red-500">Perguntas Frequentes</button>
+              <Link to="/uniformes" onClick={() => setIsMobileMenuOpen(false)} className="flex gap-2 items-center py-2 text-lg font-bold text-left text-zinc-300 hover:text-red-500"><Shirt size={18} />Uniformes</Link>
               <button 
                 onClick={() => { setIsMobileMenuOpen(false); setShowContactForm(true); }} 
                 className="py-4 mt-4 w-full font-bold tracking-wider text-white uppercase bg-red-600 transition-colors hover:bg-red-700"
@@ -1056,6 +1061,7 @@ export default function App() {
            </div>
            <div className="text-center">
                <span className="text-2xl italic font-black tracking-tighter text-white uppercase">USGO<span className="text-red-600">Jiu-Jitsu</span></span>
+               <Link to="/uniformes" className="block mt-2 text-xs tracking-widest uppercase transition-colors text-zinc-500 hover:text-red-500">Manual de Uniformes</Link>
                <p className="mt-1 text-xs tracking-widest uppercase text-zinc-600">© 2025 Todos os direitos reservados.</p>
            </div>
            
