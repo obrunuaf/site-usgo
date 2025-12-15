@@ -389,6 +389,7 @@ export default function App() {
 
   const [selectedUnit, setSelectedUnit] = useState(unitsData[0]);
   const [searchTerm, setSearchTerm] = useState("");
+  const unitsListRef = useRef(null);
 
   // Calculate distance between two points (Haversine formula)
   const calculateDistance = (lat1, lng1, lat2, lng2) => {
@@ -422,6 +423,28 @@ export default function App() {
           });
           
           setSelectedUnit(nearestUnit);
+          
+          // Scroll the units list to show the nearest unit card
+          setTimeout(() => {
+            // For desktop: scroll the container
+            if (unitsListRef.current) {
+              const container = unitsListRef.current;
+              const unitCard = container.querySelector(`#unit-card-${nearestUnit.id}`);
+              if (unitCard) {
+                const containerRect = container.getBoundingClientRect();
+                const cardRect = unitCard.getBoundingClientRect();
+                const scrollOffset = cardRect.top - containerRect.top + container.scrollTop;
+                const centerOffset = (containerRect.height / 2) - (cardRect.height / 2);
+                container.scrollTo({ top: scrollOffset - centerOffset, behavior: 'smooth' });
+              }
+            }
+            
+            // For mobile: scroll horizontally
+            const mobileCard = document.getElementById(`unit-card-${nearestUnit.id}`);
+            if (mobileCard) {
+              mobileCard.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+            }
+          }, 800);
         },
         () => {
           // User denied or error - keep default selection
@@ -881,7 +904,7 @@ export default function App() {
 
           {/* Desktop: Grid layout */}
           <div className="hidden lg:grid lg:grid-cols-3 gap-8 h-[600px]">
-             <div className="overflow-y-auto pr-2 space-y-4 lg:col-span-1 custom-scrollbar">
+             <div ref={unitsListRef} className="overflow-y-auto pr-2 space-y-4 lg:col-span-1 custom-scrollbar">
                 {filteredUnits.length > 0 ? (
                   filteredUnits.map((unit, index) => (
                     <div 
@@ -1027,14 +1050,15 @@ export default function App() {
       {/* Footer */}
       <footer className="py-12 bg-black border-t border-zinc-900">
         <div className="container flex flex-col gap-6 items-center px-6 mx-auto">
-           <div className="text-center">
-               <span className="text-2xl italic font-black tracking-tighter text-white uppercase">USGO</span>
-               <p className="mt-1 text-xs tracking-widest uppercase text-zinc-600">© 2025 Todos os direitos reservados.</p>
-           </div>
            <div className="flex gap-4">
               <a href="#" className="flex justify-center items-center w-10 h-10 text-white transition-all bg-zinc-900 hover:bg-red-600 hover:scale-110"><Instagram size={18} /></a>
               <a href="#" className="flex justify-center items-center w-10 h-10 text-white transition-all bg-zinc-900 hover:bg-red-600 hover:scale-110"><Mail size={18} /></a>
            </div>
+           <div className="text-center">
+               <span className="text-2xl italic font-black tracking-tighter text-white uppercase">USGO<span className="text-red-600">Jiu-Jitsu</span></span>
+               <p className="mt-1 text-xs tracking-widest uppercase text-zinc-600">© 2025 Todos os direitos reservados.</p>
+           </div>
+           
         </div>
       </footer>
     </div>
