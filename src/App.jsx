@@ -389,7 +389,6 @@ export default function App() {
 
   const [selectedUnit, setSelectedUnit] = useState(unitsData[0]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [locationMessage, setLocationMessage] = useState(null);
 
   // Calculate distance between two points (Haversine formula)
   const calculateDistance = (lat1, lng1, lat2, lng2) => {
@@ -423,10 +422,6 @@ export default function App() {
           });
           
           setSelectedUnit(nearestUnit);
-          setLocationMessage(`📍 Unidade mais próxima: ${nearestUnit.city} (${Math.round(minDistance)} km)`);
-          
-          // Clear message after 5 seconds
-          setTimeout(() => setLocationMessage(null), 5000);
         },
         () => {
           // User denied or error - keep default selection
@@ -506,21 +501,7 @@ export default function App() {
         <ContactForm onClose={() => setShowContactForm(false)} />
       )}
 
-      {/* Location Toast Notification */}
-      {locationMessage && (
-        <div className="fixed top-24 left-1/2 -translate-x-1/2 z-[100] animate-fade-in">
-          <div className="flex gap-3 items-center px-6 py-3 text-white rounded-full border shadow-2xl bg-zinc-900 border-white/10">
-            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-            <span className="text-sm font-medium">{locationMessage}</span>
-            <button 
-              onClick={() => setLocationMessage(null)}
-              className="ml-2 transition-colors text-zinc-400 hover:text-white"
-            >
-              ✕
-            </button>
-          </div>
-        </div>
-      )}
+
 
       {/* Floating Action Buttons Container */}
       <div className="fixed bottom-6 right-6 z-[90] flex flex-col items-end gap-3">
@@ -632,7 +613,7 @@ export default function App() {
           />
           {/* Menu panel */}
           <div 
-            className="absolute top-0 left-0 right-0 bg-zinc-900 shadow-2xl"
+            className="absolute top-0 right-0 left-0 shadow-2xl bg-zinc-900"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Menu header with logo and close button */}
@@ -641,29 +622,29 @@ export default function App() {
                 <img 
                   src={images.logo} 
                   alt="USGO Logo" 
-                  className="h-10 w-auto object-contain"
+                  className="object-contain w-auto h-10"
                 />
-                <span className="text-xl italic font-black tracking-tighter uppercase text-white">
+                <span className="text-xl italic font-black tracking-tighter text-white uppercase">
                   USGO <span className="text-red-600">Jiu-Jitsu</span>
                 </span>
               </div>
               <button 
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="text-white p-2"
+                className="p-2 text-white"
               >
                 <X size={28} />
               </button>
             </div>
             {/* Menu items */}
-            <div className="flex flex-col p-6 gap-4">
-              <button onClick={() => scrollToSection('inicio')} className="text-left text-lg font-bold text-zinc-300 hover:text-red-500 py-2">Início</button>
-              <button onClick={() => scrollToSection('sobre')} className="text-left text-lg font-bold text-zinc-300 hover:text-red-500 py-2">Sobre</button>
-              <button onClick={() => scrollToSection('escolas')} className="text-left text-lg font-bold text-zinc-300 hover:text-red-500 py-2">Escolas</button>
-              <button onClick={() => scrollToSection('galeria')} className="text-left text-lg font-bold text-zinc-300 hover:text-red-500 py-2">Galeria</button>
-              <button onClick={() => scrollToSection('faq')} className="text-left text-lg font-bold text-zinc-300 hover:text-red-500 py-2">Perguntas Frequentes</button>
+            <div className="flex flex-col gap-4 p-6">
+              <button onClick={() => scrollToSection('inicio')} className="py-2 text-lg font-bold text-left text-zinc-300 hover:text-red-500">Início</button>
+              <button onClick={() => scrollToSection('sobre')} className="py-2 text-lg font-bold text-left text-zinc-300 hover:text-red-500">Sobre</button>
+              <button onClick={() => scrollToSection('escolas')} className="py-2 text-lg font-bold text-left text-zinc-300 hover:text-red-500">Escolas</button>
+              <button onClick={() => scrollToSection('galeria')} className="py-2 text-lg font-bold text-left text-zinc-300 hover:text-red-500">Galeria</button>
+              <button onClick={() => scrollToSection('faq')} className="py-2 text-lg font-bold text-left text-zinc-300 hover:text-red-500">Perguntas Frequentes</button>
               <button 
                 onClick={() => { setIsMobileMenuOpen(false); setShowContactForm(true); }} 
-                className="mt-4 py-4 w-full font-bold tracking-wider text-white uppercase bg-red-600 hover:bg-red-700 transition-colors"
+                className="py-4 mt-4 w-full font-bold tracking-wider text-white uppercase bg-red-600 transition-colors hover:bg-red-700"
               >
                 Contato
               </button>
@@ -1045,8 +1026,8 @@ export default function App() {
 
       {/* Footer */}
       <footer className="py-12 bg-black border-t border-zinc-900">
-        <div className="container flex flex-col gap-6 justify-between items-center px-6 mx-auto md:flex-row">
-           <div className="text-left">
+        <div className="container flex flex-col gap-6 items-center px-6 mx-auto">
+           <div className="text-center">
                <span className="text-2xl italic font-black tracking-tighter text-white uppercase">USGO</span>
                <p className="mt-1 text-xs tracking-widest uppercase text-zinc-600">© 2025 Todos os direitos reservados.</p>
            </div>
