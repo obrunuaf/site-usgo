@@ -555,9 +555,9 @@ textarea:focus-visible {
     display: none;
   }
 
-  /* Mobile scroll indicator */
+  /* Mobile scroll indicator - hide to avoid overlap with buttons */
   .scroll-indicator {
-    bottom: 20px;
+    display: none;
   }
 
   /* Mobile-optimized contact modal */

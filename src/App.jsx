@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { Menu, X, ChevronDown, ChevronUp, MapPin, Phone, Mail, Instagram, ArrowRight, Search, Shield, Target, Globe, Navigation, ArrowUp, Send, CheckCircle, User, MessageSquare, MessageCircle, ChevronLeft, ChevronRight } from 'lucide-react';
 
 // ===== CUSTOM HOOKS =====
@@ -25,6 +25,18 @@ function useInView(options = {}) {
   }, [hasAnimated, options]);
 
   return [ref, isInView];
+}
+
+// Hook de debounce para otimizar a busca
+function useDebounce(value, delay = 150) {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedValue(value), delay);
+    return () => clearTimeout(timer);
+  }, [value, delay]);
+
+  return debouncedValue;
 }
 
 // ===== COMPONENTS =====
@@ -413,14 +425,6 @@ export default function App() {
           setSelectedUnit(nearestUnit);
           setLocationMessage(`📍 Unidade mais próxima: ${nearestUnit.city} (${Math.round(minDistance)} km)`);
           
-          // Scroll unit card into view after a short delay
-          setTimeout(() => {
-            const unitCard = document.getElementById(`unit-card-${nearestUnit.id}`);
-            if (unitCard) {
-              unitCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }
-          }, 500);
-          
           // Clear message after 5 seconds
           setTimeout(() => setLocationMessage(null), 5000);
         },
@@ -473,10 +477,17 @@ export default function App() {
     { src: "MG_4085.webp", alt: "Detalhe", className: "col-span-1 row-span-1" },
   ];
 
-  const filteredUnits = unitsData.filter(unit => 
-    unit.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    unit.city.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Debounce search term for better performance
+  const debouncedSearchTerm = useDebounce(searchTerm, 150);
+  
+  const filteredUnits = useMemo(() => {
+    if (!debouncedSearchTerm) return unitsData;
+    const search = debouncedSearchTerm.toLowerCase();
+    return unitsData.filter(unit => 
+      unit.name.toLowerCase().includes(search) ||
+      unit.city.toLowerCase().includes(search)
+    );
+  }, [debouncedSearchTerm]);
 
   return (
     <div className="min-h-screen font-sans text-white bg-zinc-950 selection:bg-red-600 selection:text-white">
@@ -498,12 +509,12 @@ export default function App() {
       {/* Location Toast Notification */}
       {locationMessage && (
         <div className="fixed top-24 left-1/2 -translate-x-1/2 z-[100] animate-fade-in">
-          <div className="bg-zinc-900 text-white px-6 py-3 rounded-full shadow-2xl flex items-center gap-3 border border-white/10">
+          <div className="flex gap-3 items-center px-6 py-3 text-white rounded-full border shadow-2xl bg-zinc-900 border-white/10">
             <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
             <span className="text-sm font-medium">{locationMessage}</span>
             <button 
               onClick={() => setLocationMessage(null)}
-              className="ml-2 text-zinc-400 hover:text-white transition-colors"
+              className="ml-2 transition-colors text-zinc-400 hover:text-white"
             >
               ✕
             </button>
@@ -559,15 +570,6 @@ export default function App() {
         </button>
       </div>
 
-      {/* Mobile Menu Overlay */}
-      {isMobileMenuOpen && (
-        <div 
-          className="mobile-menu-overlay lg:hidden"
-          onClick={() => setIsMobileMenuOpen(false)}
-          aria-hidden="true"
-        />
-      )}
-
       {/* Navigation */}
       <nav className={`fixed w-full z-50 transition-all duration-300 ${isScrolled ? 'py-4 border-b backdrop-blur-md bg-zinc-950/90 border-white/10' : 'py-6 bg-transparent'}`}>
         <div className="container flex justify-between items-center px-6 mx-auto">
@@ -608,14 +610,33 @@ export default function App() {
             </button>
           </div>
 
-          <button className="text-white lg:hidden" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
+          <button 
+            className="text-white lg:hidden" 
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsMobileMenuOpen(!isMobileMenuOpen);
+            }}
+          >
             {isMobileMenuOpen ? <X size={32} /> : <Menu size={32} />}
           </button>
         </div>
 
         {/* Mobile Menu with Animation */}
         {isMobileMenuOpen && (
-          <div className="flex absolute left-0 top-full flex-col gap-6 p-6 w-full border-b shadow-2xl mobile-menu bg-zinc-900 border-white/10 lg:hidden" role="menu">
+          <>
+            {/* Overlay behind menu - starts below nav to not block menu toggle */}
+            <div 
+              className="fixed inset-x-0 bottom-0 backdrop-blur-sm bg-black/70 lg:hidden"
+              style={{ zIndex: 45, top: '80px' }}
+              onClick={() => setIsMobileMenuOpen(false)}
+              aria-hidden="true"
+            />
+            <div 
+              className="flex absolute left-0 top-full flex-col gap-6 p-6 w-full border-b shadow-2xl mobile-menu bg-zinc-900 border-white/10 lg:hidden" 
+              style={{ zIndex: 55 }} 
+              role="menu"
+              onClick={(e) => e.stopPropagation()}
+            >
             <button onClick={() => scrollToSection('inicio')} className="text-lg font-bold text-left transition-colors text-zinc-300 hover:text-red-500" role="menuitem">Início</button>
             <button onClick={() => scrollToSection('sobre')} className="text-lg font-bold text-left transition-colors text-zinc-300 hover:text-red-500" role="menuitem">Sobre</button>
             <button onClick={() => scrollToSection('escolas')} className="text-lg font-bold text-left transition-colors text-zinc-300 hover:text-red-500" role="menuitem">Escolas</button>
@@ -628,7 +649,8 @@ export default function App() {
             >
               Contato
             </button>
-          </div>
+            </div>
+          </>
         )}
       </nav>
 
@@ -670,8 +692,8 @@ export default function App() {
           </div>
         </div>
 
-        {/* Scroll Indicator */}
-        <div className="scroll-indicator" onClick={() => scrollToSection('sobre')}>
+        {/* Scroll Indicator - hidden on mobile */}
+        <div className="hidden scroll-indicator sm:flex" onClick={() => scrollToSection('sobre')}>
           <span>Scroll</span>
           <div className="scroll-indicator-arrow"></div>
         </div>
