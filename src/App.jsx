@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { Menu, X, ChevronDown, ChevronUp, MapPin, Phone, Mail, Instagram, ArrowRight, Search, Shield, Target, Globe, Navigation, ArrowUp, Send, CheckCircle, User, MessageSquare, MessageCircle, ChevronLeft, ChevronRight, Shirt } from 'lucide-react';
+import Header from './components/Header';
 
 // ===== CUSTOM HOOKS =====
 
@@ -344,13 +345,10 @@ function ContactForm({ onClose }) {
 }
 
 export default function App() {
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [openFaqIndex, setOpenFaqIndex] = useState(null);
   const [showBackToTop, setShowBackToTop] = useState(false);
   const [lightboxImage, setLightboxImage] = useState(null);
   const [showContactForm, setShowContactForm] = useState(false);
-  const [showWhatsAppBubble, setShowWhatsAppBubble] = useState(true);
   
   // IMAGENS DA PASTA PUBLIC
   const images = {
@@ -427,7 +425,7 @@ export default function App() {
           
           // Scroll the units list to show the nearest unit card
           setTimeout(() => {
-            // For desktop: scroll the container
+            // For desktop: scroll the container vertically
             if (unitsListRef.current) {
               const container = unitsListRef.current;
               const unitCard = container.querySelector(`#unit-card-${nearestUnit.id}`);
@@ -440,10 +438,15 @@ export default function App() {
               }
             }
             
-            // For mobile: scroll horizontally
+            // For mobile: scroll horizontally ONLY within the cards container (not the page)
+            const mobileContainer = document.querySelector('.units-mobile-scroll');
             const mobileCard = document.getElementById(`unit-card-${nearestUnit.id}`);
-            if (mobileCard) {
-              mobileCard.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+            if (mobileContainer && mobileCard) {
+              const containerRect = mobileContainer.getBoundingClientRect();
+              const cardRect = mobileCard.getBoundingClientRect();
+              const scrollOffset = cardRect.left - containerRect.left + mobileContainer.scrollLeft;
+              const centerOffset = (containerRect.width / 2) - (cardRect.width / 2);
+              mobileContainer.scrollTo({ left: scrollOffset - centerOffset, behavior: 'smooth' });
             }
           }, 800);
         },
@@ -456,10 +459,9 @@ export default function App() {
     }
   }, []);
 
-  // Scroll handlers
+  // Scroll handler for back to top
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
       setShowBackToTop(window.scrollY > 500);
     };
     window.addEventListener('scroll', handleScroll);
@@ -467,7 +469,6 @@ export default function App() {
   }, []);
 
   const scrollToSection = useCallback((id) => {
-    setIsMobileMenuOpen(false);
     const element = document.getElementById(id);
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' });
@@ -524,162 +525,13 @@ export default function App() {
       {showContactForm && (
         <ContactForm onClose={() => setShowContactForm(false)} />
       )}
-
-
-
-      {/* Floating Action Buttons Container */}
-      <div className="fixed bottom-6 right-6 z-[90] flex flex-col items-end gap-3">
-        
-        {/* WhatsApp Chat Bubble */}
-        {showWhatsAppBubble && (
-          <div className="flex gap-2 items-center animate-fade-in">
-            <div className="relative bg-white text-zinc-800 px-4 py-3 rounded-xl shadow-xl max-w-[200px]">
-              <button 
-                onClick={() => setShowWhatsAppBubble(false)}
-                className="flex absolute -top-2 -right-2 justify-center items-center w-6 h-6 text-xs font-bold rounded-full transition-colors bg-zinc-200 hover:bg-zinc-300 text-zinc-600"
-                aria-label="Fechar"
-              >
-                ✕
-              </button>
-              <p className="text-sm font-semibold">👋 Olá! Precisa de ajuda?</p>
-              <p className="mt-1 text-xs text-zinc-500">Fale conosco pelo WhatsApp</p>
-              {/* Triangle pointer */}
-              <div className="absolute -bottom-2 right-4 w-0 h-0 border-t-8 border-r-8 border-l-8 border-transparent border-t-white"></div>
-            </div>
-          </div>
-        )}
-        
-        {/* WhatsApp Button with official icon */}
-        <a
-          href="https://wa.me/5564999999999?text=Olá!%20Gostaria%20de%20mais%20informações%20sobre%20as%20aulas."
-          target="_blank"
-          rel="noopener noreferrer"
-          className="relative flex items-center justify-center w-14 h-14 bg-[#25d366] rounded-full text-white shadow-lg hover:scale-110 hover:shadow-xl transition-all cursor-pointer"
-          aria-label="Contato via WhatsApp"
-        >
-          {/* WhatsApp SVG Icon */}
-          <svg viewBox="0 0 24 24" width="28" height="28" fill="white">
-            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
-          </svg>
-        </a>
-        
-        {/* Back to Top Button */}
-        <button 
-          onClick={scrollToTop}
-          className={`flex items-center justify-center w-14 h-14 bg-red-600 rounded-full text-white shadow-lg hover:bg-red-700 transition-all cursor-pointer ${
-            showBackToTop ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'
-          }`}
-          aria-label="Voltar ao topo"
-        >
-          <ArrowUp size={24} />
-        </button>
-      </div>
-
-      {/* Navigation */}
-      <nav className={`fixed w-full z-50 transition-all duration-300 ${isScrolled ? 'py-4 border-b backdrop-blur-md bg-zinc-950/90 border-white/10' : 'py-6 bg-transparent'}`}>
-        <div className="container flex justify-between items-center px-6 mx-auto">
-          <div className="flex gap-3 items-center cursor-pointer" onClick={() => scrollToSection('inicio')}>
-            <img 
-              src={images.logo} 
-              alt="USGO Logo" 
-              className="h-12 w-auto object-contain drop-shadow-[0_0_15px_rgba(220,38,38,0.5)]"
-              onError={(e) => {
-                e.target.onerror = null;
-                e.target.style.display = 'none';
-                e.target.nextSibling.style.display = 'flex';
-              }}
-            />
-            <div className="hidden gap-2 items-center" style={{display: 'none'}}>
-               <div className="flex justify-center items-center w-10 h-10 text-xl italic font-bold tracking-tighter bg-red-600 rounded-sm">US</div>
-            </div>
-            
-            <div className="flex flex-col leading-none">
-              <span className="text-2xl italic font-black tracking-tighter uppercase">
-                USGO <span className="text-red-600">Jiu-Jitsu</span>
-              </span>
-            </div>
-          </div>
-
-          <div className="hidden gap-8 items-center text-xs font-bold tracking-widest uppercase lg:flex text-zinc-300">
-            <button onClick={() => scrollToSection('inicio')} className="transition-colors hover:text-red-500" aria-label="Ir para início">Início</button>
-            <button onClick={() => scrollToSection('sobre')} className="transition-colors hover:text-red-500" aria-label="Ir para sobre">Sobre</button>
-            <button onClick={() => scrollToSection('escolas')} className="transition-colors hover:text-red-500" aria-label="Ir para escolas">Escolas</button>
-            <button onClick={() => scrollToSection('filiacoes')} className="transition-colors hover:text-red-500" aria-label="Ir para filiações">Filiações</button>
-            <button onClick={() => scrollToSection('galeria')} className="transition-colors hover:text-red-500" aria-label="Ir para galeria">Galeria</button>
-            <button onClick={() => scrollToSection('faq')} className="transition-colors hover:text-red-500" aria-label="Ir para perguntas frequentes">Perguntas Frequentes</button>
-            <Link to="/uniformes" className="flex gap-1 items-center transition-colors hover:text-red-500" aria-label="Ir para uniformes"><Shirt size={14} />Uniformes</Link>
-            <button 
-              onClick={() => setShowContactForm(true)}
-              className="bg-white text-black px-6 py-3 hover:bg-red-600 hover:text-white transition-all duration-300 font-black skew-x-[-10deg]"
-              aria-label="Abrir formulário de contato"
-            >
-              <span className="skew-x-[10deg] inline-block">Contato</span>
-            </button>
-          </div>
-
-          <button 
-            className="text-white lg:hidden" 
-            onClick={(e) => {
-              e.stopPropagation();
-              setIsMobileMenuOpen(!isMobileMenuOpen);
-            }}
-          >
-            {isMobileMenuOpen ? <X size={32} /> : <Menu size={32} />}
-          </button>
-        </div>
-      </nav>
-
-      {/* Mobile Menu - Outside nav for proper z-index */}
-      {isMobileMenuOpen && (
-        <div className="fixed inset-0 z-[200] lg:hidden">
-          {/* Dark overlay */}
-          <div 
-            className="absolute inset-0 bg-black/80"
-            onClick={() => setIsMobileMenuOpen(false)}
-          />
-          {/* Menu panel */}
-          <div 
-            className="absolute top-0 right-0 left-0 shadow-2xl bg-zinc-900"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Menu header with logo and close button */}
-            <div className="flex justify-between items-center p-6 border-b border-white/10">
-              <div className="flex gap-3 items-center">
-                <img 
-                  src={images.logo} 
-                  alt="USGO Logo" 
-                  className="object-contain w-auto h-10"
-                />
-                <span className="text-xl italic font-black tracking-tighter text-white uppercase">
-                  USGO <span className="text-red-600">Jiu-Jitsu</span>
-                </span>
-              </div>
-              <button 
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="p-2 text-white"
-              >
-                <X size={28} />
-              </button>
-            </div>
-            {/* Menu items */}
-            <div className="flex flex-col gap-4 p-6">
-              <button onClick={() => scrollToSection('inicio')} className="py-2 text-lg font-bold text-left text-zinc-300 hover:text-red-500">Início</button>
-              <button onClick={() => scrollToSection('sobre')} className="py-2 text-lg font-bold text-left text-zinc-300 hover:text-red-500">Sobre</button>
-              <button onClick={() => scrollToSection('escolas')} className="py-2 text-lg font-bold text-left text-zinc-300 hover:text-red-500">Escolas</button>
-              <button onClick={() => scrollToSection('filiacoes')} className="py-2 text-lg font-bold text-left text-zinc-300 hover:text-red-500">Filiações</button>
-              <button onClick={() => scrollToSection('galeria')} className="py-2 text-lg font-bold text-left text-zinc-300 hover:text-red-500">Galeria</button>
-              <button onClick={() => scrollToSection('faq')} className="py-2 text-lg font-bold text-left text-zinc-300 hover:text-red-500">Perguntas Frequentes</button>
-              <Link to="/uniformes" onClick={() => setIsMobileMenuOpen(false)} className="flex gap-2 items-center py-2 text-lg font-bold text-left text-zinc-300 hover:text-red-500"><Shirt size={18} />Uniformes</Link>
-              <button 
-                onClick={() => { setIsMobileMenuOpen(false); setShowContactForm(true); }} 
-                className="py-4 mt-4 w-full font-bold tracking-wider text-white uppercase bg-red-600 transition-colors hover:bg-red-700"
-              >
-                Contato
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Unified Header Component */}
+      <Header 
+        onContactClick={() => setShowContactForm(true)}
+        scrollToSection={scrollToSection}
+        showBackToTop={showBackToTop}
+        onScrollToTop={scrollToTop}
+      />
 
       {/* Hero Section */}
       <section id="inicio" className="flex overflow-hidden relative justify-center items-center h-screen">
@@ -804,6 +656,87 @@ export default function App() {
         </div>
       </section>
 
+      {/* Uniformes CTA Section */}
+      <section className="relative py-20 bg-zinc-900 overflow-hidden">
+        {/* Background gradient */}
+        <div className="absolute inset-0 bg-gradient-to-br from-red-900/20 via-transparent to-zinc-950"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-red-600/10 via-transparent to-transparent"></div>
+        
+        <div className="container px-6 mx-auto relative z-10">
+          <div className="grid gap-12 items-center lg:grid-cols-2">
+            {/* Text Content */}
+            <AnimatedSection className="text-center lg:text-left" animation="animate-fade-in-up">
+              <div className="inline-flex gap-3 items-center mb-4">
+                <Shirt className="text-red-600" size={24} />
+                <span className="text-xs font-bold tracking-widest text-red-600 uppercase">Identidade Visual</span>
+              </div>
+              <h2 className="mb-6 text-4xl font-black tracking-tighter text-white uppercase md:text-5xl">
+                Padrão de<br/>
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-red-700">Excelência</span>
+              </h2>
+              <p className="mb-8 text-lg text-zinc-400 max-w-xl lg:max-w-none">
+                Conheça o manual completo de uniformização da USGO. Rashguard Ranked, Kimono Oficial, Camisetas Casuais e muito mais.
+              </p>
+              <Link 
+                to="/uniformes" 
+                className="inline-flex gap-3 items-center px-8 py-4 text-sm font-bold tracking-wider text-white uppercase bg-red-600 transition-all duration-300 hover:bg-red-700 hover:-translate-y-1 shadow-[0_10px_30px_rgba(220,38,38,0.3)] hover:shadow-[0_15px_40px_rgba(220,38,38,0.4)]"
+              >
+                <Shirt size={18} />
+                Ver Manual de Uniformes
+                <ArrowRight size={18} />
+              </Link>
+            </AnimatedSection>
+
+            {/* Image Grid Preview */}
+            <AnimatedSection className="relative" animation="animate-slide-in-right">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-4">
+                  <div className="relative overflow-hidden rounded-lg aspect-square bg-zinc-800 group">
+                    <img 
+                      src="https://imgur.com/whsA9sn.png" 
+                      alt="Rashguard USGO" 
+                      className="object-cover w-full h-full transition-transform duration-500 group-hover:scale-110"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end p-4">
+                      <span className="text-xs font-bold text-white uppercase tracking-wider">Rashguard</span>
+                    </div>
+                  </div>
+                  <div className="relative overflow-hidden rounded-lg aspect-[4/3] bg-zinc-800 group">
+                    <img 
+                      src="https://i.imgur.com/6m4w1bY.jpeg" 
+                      alt="Camiseta Casual USGO" 
+                      className="object-cover w-full h-full transition-transform duration-500 group-hover:scale-110"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end p-4">
+                      <span className="text-xs font-bold text-white uppercase tracking-wider">Casual</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="space-y-4 pt-8">
+                  <div className="relative overflow-hidden rounded-lg aspect-[4/3] bg-zinc-800 group">
+                    <img 
+                      src="https://i.imgur.com/w98rIak.jpeg" 
+                      alt="Uniforme Técnico USGO" 
+                      className="object-cover w-full h-full transition-transform duration-500 group-hover:scale-110"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end p-4">
+                      <span className="text-xs font-bold text-white uppercase tracking-wider">Técnico</span>
+                    </div>
+                  </div>
+                  <div className="relative overflow-hidden rounded-lg aspect-square bg-zinc-800 group flex items-center justify-center border-2 border-dashed border-zinc-700 hover:border-red-600 transition-colors">
+                    <div className="text-center p-4">
+                      <Shirt size={32} className="mx-auto mb-2 text-zinc-600" />
+                      <span className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Kimono</span>
+                      <span className="block text-[10px] text-zinc-600 mt-1">Em breve</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </AnimatedSection>
+          </div>
+        </div>
+      </section>
+
       {/* Units Section */}
       <section id="escolas" className="relative py-16 bg-white md:py-24 text-zinc-950">
         <div className="container px-4 mx-auto md:px-6">
@@ -829,7 +762,7 @@ export default function App() {
           {/* Mobile: Horizontal scroll cards + Map below */}
           <div className="space-y-6 lg:hidden">
             {/* Horizontal scrolling cards */}
-            <div className="flex overflow-x-auto gap-4 px-4 pb-4 -mx-4 snap-x snap-mandatory scrollbar-hide">
+            <div className="units-mobile-scroll flex overflow-x-auto gap-4 px-4 pb-4 -mx-4 snap-x snap-mandatory scrollbar-hide">
               {filteredUnits.length > 0 ? (
                 filteredUnits.map((unit) => (
                   <div 
